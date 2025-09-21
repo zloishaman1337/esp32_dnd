@@ -52,6 +52,9 @@ lv_disp_drv_t disp_drv;
 lv_obj_t *label_title;
 lv_obj_t *label_current;
 lv_obj_t *label_details;
+lv_style_t style_player;
+lv_style_t style_enemy;
+lv_style_t style_big;
 
 /* ------------------ Players storage ------------------ */
 struct Player {
@@ -107,25 +110,42 @@ void update_display() {
 
   String det = "HP: " + String(p.hp) + "  CD: " + String(p.cd) + "  Init: " + String(p.init);
   lv_label_set_text(label_details, det.c_str());
+
+  // Цвет: враг = красный, игрок = белый
+  if (p.klass == "Enemy") {
+    lv_obj_add_style(label_current, &style_enemy, 0);
+    lv_obj_add_style(label_details, &style_enemy, 0);
+  } else {
+    lv_obj_add_style(label_current, &style_player, 0);
+    lv_obj_add_style(label_details, &style_player, 0);
+  }
 }
 
 /* ------------------ LVGL UI init ------------------ */
 void lv_ui_init() {
   lv_obj_t *scr = lv_scr_act();
   lv_obj_clean(scr);
+  lv_style_init(&style_player);
+  lv_style_set_text_color(&style_player, lv_color_black());
 
+  lv_style_init(&style_enemy);
+  lv_style_set_text_color(&style_enemy, lv_color_hex(0xFF0000)); // красный
+
+  lv_style_init(&style_big);
+  lv_style_set_text_font(&style_big, &lv_font_montserrat_28); // большой шрифт
   label_title = lv_label_create(scr);
   lv_label_set_text(label_title, "");
   lv_obj_align(label_title, LV_ALIGN_TOP_MID, 0, 8);
 
   label_current = lv_label_create(scr);
   lv_label_set_text(label_current, "");
-  lv_obj_set_style_text_font(label_current, lv_theme_get_font_normal(label_current), 0);
-  lv_obj_align(label_current, LV_ALIGN_CENTER, 0, -10);
+  lv_obj_add_style(label_current, &style_big, 0);
+  lv_obj_align(label_current, LV_ALIGN_CENTER, 0, -40);
 
   label_details = lv_label_create(scr);
   lv_label_set_text(label_details, "");
-  lv_obj_align(label_details, LV_ALIGN_CENTER, 0, 30);
+  lv_obj_add_style(label_details, &style_big, 0);
+  lv_obj_align(label_details, LV_ALIGN_CENTER, 0, 40);
 
   update_display();
 }
